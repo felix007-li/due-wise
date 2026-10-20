@@ -1,0 +1,12 @@
+API golden input: CAD 10.0050 → CAD 10.00; one recorded payment. All data synthetic.
+Encrypted backup created: .local/backups/duewise-20261020T192559Z.leCPfl.dump.age
+Restore completed. Run row-count, ownership and golden-fixture smoke checks before promotion.
+app_user 1:c3c60c7cbfc161552efa2758ecff16b0
+bill 1:00a259f5723952a889846661e311f8da
+flyway_schema_history 5:74df2c19794a3550386f28c126a80311
+notification_delivery 0:empty
+occurrence 13:927ee845cf43a544c27048b7b04cb588
+payment 1:257a6ed65f4df72cd8c0f58d049c6b9e
+projection_snapshot 1:711ed43751c69acb4477621bce306914
+reminder_preference 0:empty
+PASS: all 8 tables match by row count and deterministic row digest; restoreSeconds=0; plaintext cleanup verified

@@ -1,0 +1,27 @@
+{
+  "/health": {
+    "status": 200,
+    "requestIdPresent": true,
+    "body": {
+      "service": "duewise",
+      "status": "UP"
+    }
+  },
+  "/actuator/health": {
+    "status": 200,
+    "requestIdPresent": true,
+    "body": {
+      "status": "UP"
+    }
+  },
+  "/api/v1/auth/me": {
+    "status": 401,
+    "requestIdPresent": true,
+    "body": {
+      "requestId": "0c90c374-f033-4197-bf03-296503ad5787",
+      "message": "Sign in to continue.",
+      "fieldErrors": {},
+      "code": "UNAUTHORIZED"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "/": {
+    "status": 200,
+    "headers": {
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "same-origin",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+      "cache-control": "no-cache"
+    }
+  },
+  "/sw.js": {
+    "status": 200,
+    "headers": {
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "same-origin",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+      "cache-control": "no-cache"
+    }
+  },
+  "/assets/index-vC3rbXmY.js": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, immutable",
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "same-origin",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    }
+  },
+  "/api/v1/auth/me": {
+    "status": 502,
+    "headers": {
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "same-origin",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+      "cache-control": "no-store"
+    }
+  }
+}

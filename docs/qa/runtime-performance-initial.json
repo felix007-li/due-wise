@@ -1,0 +1,28 @@
+{
+  "fixtureBills": 20,
+  "concurrency": 4,
+  "samples": 100,
+  "warmupPerEndpoint": 1,
+  "endpoints": {
+    "/dashboard": {
+      "samples": 25,
+      "p95Ms": 619.24,
+      "maxMs": 680.56
+    },
+    "/bills": {
+      "samples": 25,
+      "p95Ms": 313.14,
+      "maxMs": 396.33
+    },
+    "/calendar": {
+      "samples": 25,
+      "p95Ms": 441.39,
+      "maxMs": 493.7
+    },
+    "/insights": {
+      "samples": 25,
+      "p95Ms": 626.31,
+      "maxMs": 630.84
+    }
+  }
+}

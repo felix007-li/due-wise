@@ -1,0 +1,8 @@
+{
+  "purpose": "pre-push source-file review; Git staging unavailable due to host denial",
+  "candidateFiles": 177,
+  "totalBytes": 7458389,
+  "credentialPatternFindings": [],
+  "filesAtLeast50MiB": [],
+  "scope": "Source/docs/labelled synthetic QA evidence; excludes local env, databases, caches, builds and private-key/backup extensions. Targeted pattern review is not a comprehensive secret scanner."
+}

@@ -1,0 +1,126 @@
+name: DueWise verification
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.11-alpine
+        env:
+          POSTGRES_DB: duewise
+          POSTGRES_USER: duewise
+          POSTGRES_PASSWORD: ci-only-disposable-password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd 'pg_isready -U duewise'
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Release gate regression tests
+        run: python3 -m unittest discover -s infra/scripts -p 'test_check*.py'
+      - run: ./gradlew cleanTest test bootJar --no-daemon
+        working-directory: backend
+      - name: Require actual PostgreSQL tests and zero skips
+        if: ${{ !cancelled() }}
+        run: python3 infra/scripts/check_test_reports.py > docs/qa/ci-backend-test-gate.json
+      - run: npm ci && npm run lint && npm test && npm run build && npm audit --audit-level=high
+        working-directory: frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - name: Start PostgreSQL-backed API for browser tests
+        run: java -jar backend/build/libs/duewise-0.1.0.jar > backend-runtime.log 2>&1 &
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/duewise
+          DB_USER: duewise
+          DB_PASSWORD: ci-only-disposable-password
+          SESSION_SECURE: "false"
+      - run: for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8080/health && exit 0; sleep 1; done; exit 1
+      - run: npx playwright test
+        working-directory: frontend
+        env:
+          DUEWISE_TEST_PREVIEW: "1"
+      - run: python3 infra/scripts/test_backup.py
+      - name: Verify liveness, readiness and anonymous request correlation
+        run: python3 infra/scripts/check_runtime.py > docs/qa/ci-runtime-probe.json
+      - name: API performance acceptance
+        run: python3 infra/scripts/test_runtime.py
+        env:
+          DUEWISE_TEST_API_URL: http://127.0.0.1:8080/api/v1
+      - name: Rehearse encrypted restore with isolated synthetic records
+        run: |
+          docker run -d --name duewise-qa-postgres -e POSTGRES_DB=duewise_qa -e POSTGRES_USER=duewise_qa -e POSTGRES_PASSWORD=synthetic-qa-only -p 127.0.0.1:55435:5432 postgres:16.11-alpine
+          for i in $(seq 1 30); do docker exec duewise-qa-postgres pg_isready -U duewise_qa && break; sleep 1; done
+          docker exec duewise-qa-postgres apk add --no-cache bash age
+          docker cp infra/scripts/backup.sh duewise-qa-postgres:/tmp/backup.sh
+          docker cp infra/scripts/restore.sh duewise-qa-postgres:/tmp/restore.sh
+          docker cp infra/scripts/rehearse_restore.sh duewise-qa-postgres:/tmp/rehearse_restore.sh
+          DB_URL=jdbc:postgresql://127.0.0.1:55435/duewise_qa DB_USER=duewise_qa DB_PASSWORD=synthetic-qa-only SESSION_SECURE=false PORT=18982 java -jar backend/build/libs/duewise-0.1.0.jar > restore-api.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:18982/health && break; sleep 1; done
+          python3 infra/scripts/test_restore_runtime.py
+      - name: Build backend release image
+        id: backend-image
+        if: ${{ !cancelled() }}
+        run: docker build -t duewise-backend:ci backend
+      - name: Build frontend release image
+        id: frontend-image
+        if: ${{ !cancelled() }}
+        run: docker build -t duewise-frontend:ci frontend
+      - name: Scan packaged Java dependencies
+        if: ${{ !cancelled() && hashFiles('backend/build/libs/*.jar') != '' }}
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: rootfs
+          scan-ref: backend/build/libs
+          format: json
+          output: docs/qa/ci-backend-security.json
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: false
+      - name: Scan backend image
+        if: ${{ !cancelled() && steps.backend-image.outcome == 'success' }}
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: duewise-backend:ci
+          format: json
+          output: docs/qa/ci-backend-image-security.json
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: false
+      - name: Scan frontend image
+        if: ${{ !cancelled() && steps.frontend-image.outcome == 'success' }}
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: duewise-frontend:ci
+          format: json
+          output: docs/qa/ci-frontend-image-security.json
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: false
+      - uses: aquasecurity/trivy-action@0.33.1
+        if: ${{ !cancelled() }}
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: false
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-evidence
+          path: |
+            backend/build/reports/tests/
+            frontend/test-results/
+            docs/qa/

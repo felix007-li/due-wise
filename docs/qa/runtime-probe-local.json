@@ -1,0 +1,38 @@
+{
+  "environment": "isolated loopback API on 18983, local profile with temporary H2 memory database; not staging/PostgreSQL acceptance",
+  "healthy": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "liveness",
+        "passed": true
+      },
+      {
+        "check": "readiness",
+        "passed": true
+      },
+      {
+        "check": "anonymous_correlation",
+        "passed": true
+      }
+    ]
+  },
+  "after_graceful_shutdown": {
+    "passed": false,
+    "checks": [
+      {
+        "check": "liveness",
+        "passed": false
+      },
+      {
+        "check": "readiness",
+        "passed": false
+      },
+      {
+        "check": "anonymous_correlation",
+        "passed": false
+      }
+    ]
+  },
+  "shutdown_probe_exit_code": 1
+}

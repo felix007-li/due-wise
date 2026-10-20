@@ -1,0 +1,41 @@
+CREATE TABLE occurrence (
+ id UUID PRIMARY KEY,
+ user_id UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+ bill_id UUID NOT NULL REFERENCES bill(id),
+ due_date DATE NOT NULL,
+ name VARCHAR(120) NOT NULL,
+ category VARCHAR(40) NOT NULL,
+ subscription BOOLEAN NOT NULL,
+ amount NUMERIC(19,4) NOT NULL,
+ currency VARCHAR(3) NOT NULL,
+ created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+ updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+ row_version BIGINT NOT NULL DEFAULT 0,
+ UNIQUE(bill_id,due_date)
+);
+CREATE TABLE payment (
+ id UUID PRIMARY KEY,
+ user_id UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+ occurrence_id UUID NOT NULL UNIQUE REFERENCES occurrence(id),
+ created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+ updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+ row_version BIGINT NOT NULL DEFAULT 0
+);
+CREATE TABLE reminder_preference (
+ id UUID PRIMARY KEY,
+ user_id UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+ enabled BOOLEAN NOT NULL DEFAULT TRUE,
+ created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+ updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+ row_version BIGINT NOT NULL DEFAULT 0
+);
+CREATE TABLE notification_delivery (
+ id UUID PRIMARY KEY,
+ user_id UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+ occurrence_id UUID NOT NULL REFERENCES occurrence(id),
+ delivery_date DATE NOT NULL,
+ created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+ updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+ row_version BIGINT NOT NULL DEFAULT 0,
+ UNIQUE(occurrence_id,delivery_date)
+);

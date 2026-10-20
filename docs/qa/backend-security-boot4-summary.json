@@ -1,0 +1,25 @@
+{
+  "scan": "Trivy rootfs, scanners=vuln, severity=HIGH,CRITICAL, exit-code=1; passed",
+  "scannerVersion": "0.76.0",
+  "archiveSha256": "adff611cb366fba6f1ecad72195c9536f87e0036d1bf8999d155b17d9541d0e8",
+  "reportSha256": "9b194969a7b127e567558a6c885ef8f4879a3c66a02d7692df1fadb3952f78e5",
+  "createdAt": "2026-10-20T19:23:57.105000677Z",
+  "highCriticalFindings": 0,
+  "keyLibraries": [
+    "springdoc-openapi-starter-webmvc-ui-3.0.3.jar",
+    "postgresql-42.7.13.jar",
+    "spring-webmvc-7.0.9.jar",
+    "spring-boot-4.0.8.jar",
+    "jackson-databind-2.21.7.jar",
+    "jackson-core-2.21.7.jar",
+    "jackson-core-3.1.8.jar",
+    "jackson-databind-3.1.8.jar",
+    "tomcat-embed-core-11.0.27.jar"
+  ],
+  "vulnerabilityDatabase": {
+    "Version": 2,
+    "NextUpdate": "2026-10-21T01:16:59.036595078Z",
+    "UpdatedAt": "2026-10-20T01:16:59.036595599Z",
+    "DownloadedAt": "2026-10-20T05:06:32.055219834Z"
+  }
+}

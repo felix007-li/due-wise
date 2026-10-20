@@ -1,0 +1,1 @@
+{"passed": true, "checks": [{"check": "liveness", "passed": true}, {"check": "readiness", "passed": true}, {"check": "anonymous_correlation", "passed": true}]}
